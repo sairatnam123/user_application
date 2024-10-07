@@ -4,26 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>user management</title>
+  <script src="..//static/js/script.js"></script>
+  <link rel="stylesheet" href="..//static/css/style.css">
 </head>
 <body>
-  
-  <form id="userForm">
+  <h1 class="userform">User Management</h1>
+  <form id="userForm" action="{{url_for(users)}}" method=["POST","GET"] >
     <label>First Name:</label>
-    <input type="text" name="firstName" required>
+    <input type="text" name="firstName" id="firstName">
     <br>
+    <span class="error-message" id="firstNameError">Please enter letters only.</span><br>
     <label>Last Name:</label>
-    <input type="text" name="lastName" required>
+    <input type="text" name="lastName" id="lastName" required>
     <br>
+    <span class="error-message" id="lastNameError">Please enter letters only.</span><br>
     <label>Phone Number:</label>
-    <input type="text" name="phoneNumber" pattern="^\d{10}$" required>
+    <input type="text" name="phoneNumber" id="phoneNumber"   required>
     <br>
+    <span id="phoneNumberError" class="error"></span><br>
     <label>Email:</label>
-    <input type="email" name="email" required>
+    <input type="email" name="email" id="email" required>
     <br>
+    <span id="EmailError" class="error"></span><br>
     <label>Address:</label>
-    <textarea name="address"></textarea>
+    <textarea name="address" id="address"></textarea>
     <br>
-    <button type="submit">Submit</button>
+    <button type="submit" id="submit" >Submit</button>
   </form>
 </body>
 </html>

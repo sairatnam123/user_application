@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify,render_template
+from flask import Flask, request, jsonify,render_template,redirect,url_for
 import mysql.connector
 from mysql.connector import Error
 
 app = Flask(__name__)
 
 @app.route('/')
+@app.route('/users')
 def index():
     return render_template('index.html')
 
@@ -23,9 +24,10 @@ def create_connection():
     return connection
 
 # Create a new user
-@app.route('/', methods=['POST'])
+@app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
+    print(data)
     first_name = data['first_name']
     last_name = data['last_name']
     phone_number = data['phone_number']
@@ -33,6 +35,7 @@ def create_user():
     address = data['address']
 
     connection = create_connection()
+    print(connection)
     cursor = connection.cursor()
 
     query = """
@@ -52,7 +55,7 @@ def create_user():
     return jsonify(response)
 
 # Get all users
-@app.route('/', methods=['GET'])
+@app.route('/users', methods=['GET'])
 def get_users():
     connection = create_connection()
     cursor = connection.cursor(dictionary=True)
@@ -67,7 +70,7 @@ def get_users():
     return jsonify(users)
 
 # Update a user
-@app.route('/<int:id>', methods=['PUT'])
+@app.route('/users/<int:id>', methods=['PUT'])
 def update_user(id):
     data = request.get_json()
     first_name = data['first_name']
@@ -96,7 +99,7 @@ def update_user(id):
     return jsonify(response)
 
 # Delete a user
-@app.route('/<int:id>', methods=['DELETE'])
+@app.route('/users/<int:id>', methods=['DELETE'])
 def delete_user(id):
     connection = create_connection()
     cursor = connection.cursor()
@@ -113,6 +116,17 @@ def delete_user(id):
         connection.close()
 
     return jsonify(response)
+
+@app.route('/submit', methods=['POST'])
+def submit_form():
+    first_name = request.form.get('firstName')
+    last_name = request.form.get('lastName')
+    email = request.form.get('email')
+
+    # Process the form data (e.g., save to database)
+    print(f"Received: {first_name} {last_name}, Email: {email}")
+
+    return redirect(url_for('index')) 
 
 if __name__ == "__main__":
     app.run(debug=True)

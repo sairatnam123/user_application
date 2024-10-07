@@ -1,0 +1,24 @@
+.error {
+    color: red;
+    font-size: 0.9em;
+}
+.userform{
+    color:blueviolet;
+}
+.valid {
+    border-color: green;
+}
+
+.invalid {
+    border-color: red;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    display: none;
+}
+
+.error-message.active {
+    display: block;
+}
