@@ -135,26 +135,6 @@ lastNameInput.addEventListener('input', function() {
                 }
             })
        
-    const form = document.getElementById('userForm');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent the page from refreshing
-
-            const formData = new FormData(form);
-            fetch('/submit', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (response.ok) {
-                    alert('Form submitted successfully!');
-                } else {
-                    alert('Form submission failed.');
-                }
-            });
-        });
-    } else {
-        console.error('Form not found.');
-    }
 });
 
 

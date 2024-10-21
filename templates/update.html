@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <script src="{{url_for('static', filename='js/script.js')  }}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+    <h1>Update User</h1>
+    <form action="{{ url_for('update_user', user_id=user.id) }}" method="POST">
+        <label>First Name:</label>
+        <input type="text" name="firstName" id="firstName" value="{{user.first_name}}">
+        <br>
+        <span class="error-message" id="firstNameError">Please enter letters only.</span><br>
+        <label>Last Name:</label>
+        <input type="text" name="lastName" id="lastName" value="{{user.last_name}}" required>
+        <br>
+        <span class="error-message" id="lastNameError">Please enter letters only.</span><br>
+        <label>Phone Number:</label>
+        <input type="text" name="phoneNumber" id="phoneNumber"  value={{user.phone_number}} required>
+        <br>
+        <span id="phoneNumberError" class="error"></span><br>
+        <label>Email:</label>
+        <input type="email" name="email" id="email" value={{user.email}} required>
+        <br>
+        <span id="EmailError" class="error"></span><br>
+        <label>Address:</label>
+        <textarea name="address" id="address">{{user.address}}</textarea>
+        <br>
+        <button type="submit" id="submit" >Update</button>
+    </form>
+</body>
+</html>

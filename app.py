@@ -1,14 +1,8 @@
-from flask import Flask, request, jsonify,render_template,redirect,url_for
+from flask import Flask, request,render_template,redirect,url_for
 import mysql.connector
 from mysql.connector import Error
 
 app = Flask(__name__)
-
-@app.route('/')
-@app.route('/users')
-def index():
-    return render_template('index.html')
-
 # Database connection
 def create_connection():
     connection = None
@@ -16,47 +10,14 @@ def create_connection():
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="Sai@12345",
+            password="*****",
             database="user_management"
         )
     except Error as e:
         print(f"Error: '{e}'")
     return connection
-
-# Create a new user
-@app.route('/users', methods=['POST'])
-def create_user():
-    data = request.get_json()
-    print(data)
-    first_name = data['first_name']
-    last_name = data['last_name']
-    phone_number = data['phone_number']
-    email = data['email']
-    address = data['address']
-
-    connection = create_connection()
-    print(connection)
-    cursor = connection.cursor()
-
-    query = """
-    INSERT INTO users (first_name, last_name, phone_number, email, address)
-    VALUES (%s, %s, %s, %s, %s)
-    """
-    try:
-        cursor.execute(query, (first_name, last_name, phone_number, email, address))
-        connection.commit()
-        response = {"message": "User created successfully", "user_id": cursor.lastrowid}
-    except Error as e:
-        response = {"error": str(e)}
-    finally:
-        cursor.close()
-        connection.close()
-
-    return jsonify(response)
-
-# Get all users
-@app.route('/users', methods=['GET'])
-def get_users():
+@app.route('/')
+def index():
     connection = create_connection()
     cursor = connection.cursor(dictionary=True)
 
@@ -66,18 +27,56 @@ def get_users():
 
     cursor.close()
     connection.close()
+    return render_template('index.html',users=users)
 
-    return jsonify(users)
 
-# Update a user
-@app.route('/users/<int:id>', methods=['PUT'])
-def update_user(id):
-    data = request.get_json()
-    first_name = data['first_name']
-    last_name = data['last_name']
-    phone_number = data['phone_number']
-    email = data['email']
-    address = data['address']
+
+# Create a new user
+@app.route('/user', methods=['POST','GET'])
+def add_user():
+    if request.method == 'POST':
+        first_name = request.form['firstName']
+        last_name = request.form['lastName']
+        phone_number = request.form['phoneNumber']
+        email = request.form['email']
+        address = request.form['address']
+
+        connection = create_connection()
+        cursor = connection.cursor()
+
+        query = """
+        INSERT INTO users (first_name, last_name, phone_number, email, address)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        try:
+            cursor.execute(query, (first_name, last_name, phone_number, email, address))
+            connection.commit()
+        except Error as e:
+            print ("error", str(e))
+        finally:
+            cursor.close()
+            connection.close()
+        return redirect(url_for('index'))
+    return render_template('user.html')
+
+@app.route('/edit/<int:user_id>', methods=['GET'])
+def edit_user(user_id):
+    # Fetch user details to pre-fill the form
+    connection = create_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    return render_template('update.html', user=user)
+
+@app.route('/update/<int:user_id>', methods=['POST'])
+def update_user(user_id):
+    # Get form data
+    first_name = request.form['firstName']
+    last_name = request.form['lastName']
+    phone_number = request.form['phoneNumber']
+    email = request.form['email']
+    address = request.form['address']
 
     connection = create_connection()
     cursor = connection.cursor()
@@ -87,19 +86,17 @@ def update_user(id):
     WHERE id = %s
     """
     try:
-        cursor.execute(query, (first_name, last_name, phone_number, email, address, id))
-        connection.commit()
-        response = {"message": "User updated successfully"}
+        cursor.execute(query, (first_name, last_name, phone_number, email, address,user_id))
+        connection.commit()    
     except Error as e:
-        response = {"error": str(e)}
+        pass
     finally:
         cursor.close()
         connection.close()
-
-    return jsonify(response)
+    return redirect(url_for('index'))
 
 # Delete a user
-@app.route('/users/<int:id>', methods=['DELETE'])
+@app.route('/delete/<int:id>', methods=['DELETE','GET'])
 def delete_user(id):
     connection = create_connection()
     cursor = connection.cursor()
@@ -108,14 +105,13 @@ def delete_user(id):
     try:
         cursor.execute(query, (id,))
         connection.commit()
-        response = {"message": "User deleted successfully"}
     except Error as e:
-        response = {"error": str(e)}
+        pass
     finally:
         cursor.close()
         connection.close()
 
-    return jsonify(response)
+    return redirect(url_for('index'))
 
 @app.route('/submit', methods=['POST'])
 def submit_form():
